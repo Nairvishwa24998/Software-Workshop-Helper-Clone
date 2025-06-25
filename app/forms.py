@@ -3,7 +3,6 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField, HiddenField, SelectField, IntegerField, StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired
 
-
 class StudentForm(FlaskForm):
     name = StringField('Name of the Student', validators=[DataRequired()])
     seat_number = StringField('Seat Number', validators=[DataRequired()])
