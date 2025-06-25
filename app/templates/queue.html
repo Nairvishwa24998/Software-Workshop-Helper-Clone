@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="col-lg-3">
+    <p id = "emptyMessage" style="display:none">No students currently in que</p>
+        <table class="table" id = "student_que_table">
+            <thead>
+                <tr>
+                    <th>Name of Student</th>
+                    <th>Seat Number</th>
+                    <th>Topic</th>
+                    <th>Time of Request</th>
+                </tr>
+            </thead>
+            <tbody id = "student_que_body">
+                {% for student in current_que %}
+                    <tr>
+                        <td>{{ student.name}}</td>
+                        <td>{{ student.seat_number }}</td>
+                        <td>{{ student.topic}}</td>
+                        <td>{{ student.time_of_request}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+     </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Step 1: Connect to WebSocket server
+        var socket = io.connect();
+        console.log("Hellooo");
+
+        // Step 2: Listen for an event called "update_queue"
+            socket.on("update_queue", function(data) {
+            console.log("Queue updated:", data.queue);  // Debugging: logs the received queue data
+
+            var queueBody = document.getElementById("student_que_body");  // Select the table body
+            var queueTable = document.getElementById("student_que_table");  // Select the table
+            var emptyMessage = document.getElementById("emptyMessage");  // Select the "No students" message
+
+            // Step 3: Clear the existing table rows
+            queueBody.innerHTML = "";
+
+            // Step 4: Check if queue is empty
+            if (data.queue.length === 0) {
+                queueTable.style.display = "none";  // Hide table
+                emptyMessage.style.display = "block";  // Show "No students" message
+            } else {
+                queueTable.style.display = "table";  // Show table
+                emptyMessage.style.display = "none";  // Hide "No students" message
+
+                // Step 5: Loop through the queue and add rows to the table
+                data.queue.forEach(function(student) {
+                    var row = document.createElement("tr");  // Create a new row
+                    row.innerHTML = `<td>${student.name}</td>
+                                     <td>${student.seat_number}</td>
+                                     <td>${student.topic}</td>
+                                     <td>${student.time_of_request}</td>`;
+                    queueBody.appendChild(row);  // Add the row to the table
+                });
+            }
+        })});
+</script>
+{% endblock %}
